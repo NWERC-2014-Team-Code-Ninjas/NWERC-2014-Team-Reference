@@ -47,6 +47,25 @@ int main(void) {
     return 0;
 }
 
+----------Extended GCD algorithm----------
+struct ans {
+    int x, y, gcd;
+};
+
+//To find an inverse of a mod n, a must be coprime with n and we sould run
+//extGcd(a, n) and take the x value of the result - this is the inverse
+//a * x + b * y = gcd(a,b)
+ans extGcd(int a, int b) {
+    //PRE: a > b ??? seems to work without it
+    ans res;
+    if (b == 0) {res.x=1; res.y=0; res.gcd=a;}
+    else {
+	ans prev = extGcd(b, a % b);
+	res.x = prev.y; res.y = prev.x - (a / b) * prev.y; res.gcd = prev.gcd;
+    }
+    return res;
+}
+
 ----------Online LCA O(n log n)----------
 #include <vector>
 #include <algorithm>
