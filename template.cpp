@@ -275,3 +275,89 @@ int maxMatching(void) {
     }
     return res;
 }
+
+----------Shortest distance between all pairs of points O(n log n)----------
+#include <algorithm>
+#include <cmath>
+#include <vector>
+using namespace std;
+
+#define MAX_N 50000
+#define MIN(a,b) ((a)<(b)) ? a : b 
+#define MAX(a,b) ((a)>(b)) ? a : b
+
+struct point {
+    int x, y, nr;
+};
+
+struct ans {
+    long long dist;
+    int index1, index2;
+    void operator=(const ans& val) {
+	dist = val.dist;
+	index1 = val.index1;
+	index2 = val.index2;
+    }
+    bool operator<(const ans& val) const {
+	return dist < val.dist;
+    }
+};
+
+bool compX(const point pA, const point pB) {
+    return pA.x < pB.x;
+}
+
+bool compY(const point pA, const point pB) {
+    return pA.y < pB.y;
+}
+
+inline long long dist(const point pA, const point pB) {
+    long long aX = static_cast<long long>(pA.x);
+    long long bX = static_cast<long long>(pB.x);
+    long long aY = static_cast<long long>(pA.y);
+    long long bY = static_cast<long long>(pB.y);
+    return ((aX - bX) * (aX - bX) + (aY - bY) * (aY - bY));
+}
+
+ans minDist(point *tab, int n) {
+    if (n >= 2) {
+	ans res = {dist(tab[0], tab[1]), tab[0].nr, tab[1].nr};
+	if (n == 3) {
+	    ans cand1 = {dist(tab[0], tab[2]), tab[0].nr, tab[2].nr};
+	    res = MIN(res, cand1);
+	    ans cand2 = {dist(tab[1], tab[2]), tab[1].nr, tab[2].nr};
+	    res = MIN(res, cand2);
+	}
+	return res;
+    }
+}
+
+ans closestPair(point *tabX, point *tabY, int n) {
+    if (n <= 3) {
+	return minDist(tabX, n);
+    }
+    int m = n/2;
+    ans ansL = closestPair(tabX, tabY, m);
+    ans ansR = closestPair(tabX + m, tabY + m, n - m);
+    ans res = MIN(ansL, ansR);
+    long long distMin = res.dist;
+    vector<point> temp;
+    for (int i=0; i<n; i++) {
+	if (abs(tabY[m].x - tabY[i].x) < distMin) {
+	    temp.push_back(tabY[i]);
+	}
+    }
+    for (int i=0; i<temp.size(); i++) {
+	for (int k=i+1; k<temp.size() && dist(temp[i],temp[k])<distMin; k++) {
+	    ans candRes = { dist(temp[i],temp[k]), temp[i].nr, temp[k].nr};
+	    res = MIN(res, candRes);
+	}
+    }
+    return res;
+}
+
+ans calcRes(point *tabX, point *tabY, int n) {
+    sort(tabX, tabX + n, compX);
+    sort(tabY, tabY + n, compY);
+    return closestPair(tabX, tabY, n);
+}
