@@ -247,3 +247,38 @@ int maxMatching(void) {
     }
     return res;
 }
+
+
+----------KMP O(n + m)-------------
+#include<string>
+#include<cstdio>
+
+#define MAX_M 1001
+
+int prefixes[MAX_M];
+std::string t, p;
+
+//compute longest prefixes of P which are proper suffixes of P_q
+int prefix() {
+    prefixes[1] = 0;
+    int k = 0;
+    for(int q = 2; q <= p.length(); q++) {
+        while (k > 0 && p[k] != p[q-1]) k = prefixes[k];
+        if (p[k] == p[q-1]) k++;
+        prefixes[q] = k;
+    }
+}
+//print out shifts for which pattern occurs in target
+void kmp(){
+    prefix();
+    int q = 0;
+    for (int i = 1; i <= t.length(); i++) {
+        while(q > 0 && p[q] != t[i-1]) q = prefixes[q];
+        if (p[q] == t[i-1]) q++;
+        if (q == p.length()) {
+            printf("valid shift: %d\n", i - (int) p.length()); q = prefixes[q];
+        }
+    }
+}
+
+
