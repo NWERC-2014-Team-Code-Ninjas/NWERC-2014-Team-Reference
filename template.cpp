@@ -66,6 +66,34 @@ ans extGcd(int a, int b) {
     return res;
 }
 
+----------Union Find algorithm with the heuristics(path compression and joining 
+according to rank) O(m alpha(n))----------
+#define MAX_N 10001
+int rank[MAX_N];//upper bound on the length of the path from the root to a leaf
+int rep[MAX_N];
+
+void makeSet(int x) {
+    rank[x] = 0;
+    rep[x] = x;
+}
+
+int findSet(int x) {
+    if (x != rep[x]) rep[x] = findSet(rep[x]); //path compression
+    return rep[x];
+}
+
+void link(int x, int y) {
+    if (rank[x] > rank[y]) rep[y] = x;//join according to rang
+    else {
+	if (rank[x] == rank[y]) rank[y]++;
+	rep[x] = y;
+    }
+}
+
+void unionSet(int x, int y) {
+    link(findSet(x), findSet(y));
+}
+
 ----------Online LCA O(n log n)----------
 #include <vector>
 #include <algorithm>
